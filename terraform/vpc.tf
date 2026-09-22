@@ -1,5 +1,3 @@
-Membangun VPC, Public Subnet (Load Balancer/Frontend), Private Subnet (Backend/Database), dan Route Tables:
-Terraform
 # 1. Virtual Private Cloud (VPC)
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
