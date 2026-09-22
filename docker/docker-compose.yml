@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Container
+  postgres:
+    image: postgres:16-alpine
+    container_name: stephanie_keys_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: stephanie_keys_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PhanilieStrongPassword2026!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d stephanie_keys_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend ASP.NET Core API Service (.NET 10)
+  backend:
+    build:
+      context: ../apps/backend
+      dockerfile: Dockerfile
+    container_name: stephanie_keys_backend
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=stephanie_keys_db;Username=postgres;Password=PhanilieStrongPassword2026!;SslMode=Disable"
+      Jwt__Secret: "YourSuperSecretJwtKeyWithMinimum32CharactersLengthForSecurity!"
+      Jwt__Issuer: "StephanieKeysPlatform"
+      Jwt__Audience: "StephanieKeysUsers"
+      Storage__Provider: "Local"
+      Storage__LocalStoragePath: "uploads"
+    ports:
+      - "5013:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - backend_uploads:/app/uploads
+
+  # Frontend React Vite Service
+  frontend:
+    build:
+      context: ../apps/frontend
+      dockerfile: Dockerfile
+    container_name: stephanie_keys_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  backend_uploads:
