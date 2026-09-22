@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert-rules.yml"
+
+scrape_configs:
+  # Metrik internal Prometheus
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Metrik aplikasi Backend ASP.NET Core (.NET 10)
+  - job_name: "stephanie-keys-backend"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["backend:8080"]
+
+  # Metrik performa Container/Server (cAdvisor)
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]

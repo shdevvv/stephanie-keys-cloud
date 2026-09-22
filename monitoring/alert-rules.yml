@@ -1,0 +1,22 @@
+groups:
+  - name: stephanie_keys_alerts
+    rules:
+      # Peringatan jika Backend ASP.NET Core mati
+      - alert: BackendServiceDown
+        expr: up{job="stephanie-keys-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service Backend Stephanie Keys Down!"
+          description: "Backend ASP.NET Core tidak merespons selama lebih dari 1 menit."
+
+      # Peringatan jika konsumsi memori tinggi
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Penggunaan Memori Tinggi (>85%)"
+          description: "Container terdeteksi menggunakan memori melebihi ambang batas 85%."
